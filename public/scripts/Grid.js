@@ -3,30 +3,48 @@ class Grid
 {
   constructor(cell_size)
   {
-    this.cell_size = cell_size;
-    this.max_cell_size = 64; //TODO: NO NEED FOR THIS??
-    this.min_cell_size = 16;
+    ////// Initialize Instance Variables /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.cell_size = -1;
     this.cells = [];
+    ////// Initialize Cell Size //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.set_cell_size(cell_size);
+    ////// Instantiate Cells /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    this.init_cells();
+  }
 
-    //Instantiate Cells.
-    var number_of_rows = parseInt(CANVAS.style.width) / this.cell_size;
-    var number_of_columns = parseInt(CANVAS.style.height) / this.cell_size;
+  init_cells()
+  {
+    var canvas_width = parseInt(CANVAS.width); //parseInt(arg0) is used as saftey!
+    var canvas_height = parseInt(CANVAS.height);
+    var number_of_rows = canvas_height / this.get_cell_size();
+    var number_of_columns = canvas_width / this.get_cell_size();
     console.log("Rows: " + number_of_rows, "Columns: " + number_of_columns);
+    var x = 0;
+    var y = 0;
     for(let i = 0; i < number_of_rows; i++)
     {
-      let row_coordinate = number_of_rows / i;
-      this.cells[i] = [];
+      this.cells[i] = []; //Set up a new row as an array with in an array.
       for(let j = 0; j < number_of_columns; j++)
       {
-        let column_coordinate = number_of_columns / j;
-        this.cells[i][j] = new Cell(row_coordinate + this.cell_size / 2, column_coordinate + this.cell_size / 2);
+        this.cells[i][j] = new Cell(x, y, this.get_cell_size());
+        x += this.get_cell_size();
       }
+      x = 0;
+      y += this.get_cell_size();
     }
   }
 
   get_cell_size()
   {
     return this.cell_size;
+  }
+
+  set_cell_size(size)
+  {
+    if(size >= MIN_CELL_SIZE && size <= MAX_CELL_SIZE)
+    {
+      this.cell_size = size;
+    }
   }
 
   get_cells()
@@ -49,11 +67,29 @@ class Grid
     this.cells[row][column].set_occupancy(status);
   }
 
-  set_cell_size(size)
+  get_number_of_rows()
   {
-    if(size >= this.min_cell_size && size <= this.max_cell_size)
+    return this.get_cells().length;
+  }
+
+  get_number_columns_in_row(row)
+  {
+    return this.get_cells()[row].length;
+  }
+
+  filter_cells(occupancy)
+  {
+    var random_coordinates = [];
+    for(let i = 0; i < this.get_cells().length; i++)
     {
-      this.cell_size = size;
+      for(let j = 0; j < this.get_cells()[i].length; j++)
+      {
+        if(this.get_cell_occupancy(i, j) == occupancy)
+        {
+          random_coordinates.push([i, j]);
+        }
+      }
     }
+    return random_coordinates;
   }
 }
