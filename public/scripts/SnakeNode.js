@@ -23,8 +23,6 @@ class SnakeNode extends Indexable
     this.set_row(node.get_row());
     this.set_column(node.get_column());
     this.set_direction(node.get_direction());
-    this.set_previous(node.get_previous());
-    this.set_next(node.get_next());
   }
 
   get_direction()

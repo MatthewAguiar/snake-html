@@ -19,6 +19,7 @@ class Game
     this.delay = -1;
     this.font_size = -1; //pt.
     this.game_state = GAMESTATE_ENUM.start;
+    this.start_game_function_ref = this.activate_start_game_listener.bind(this);
     this.player_direction = DIRECTION.right;
     this.canvas_width = -1;
     this.canvas_height = -1;
@@ -46,10 +47,10 @@ class Game
     ////// Setup Snake ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.set_snake(new Snake());
     this.init_snake_onto_grid(snake_length);
-    ////// Setup Key Listener ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    document.addEventListener("keydown", this.key_handler.bind(this));
-    ////// Begin Game Loop ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.game_loop();
+    ////// Setup Key Listeners ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    document.addEventListener("keydown", this.start_game_function_ref);
+    document.addEventListener("keydown", this.direction_handler.bind(this));
+    ////// Begin Animation Loop ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.animation();
   }
 
@@ -79,60 +80,60 @@ class Game
 
   game_loop()
   {
-    setInterval(this.step.bind(this), this.get_delay());
+    var loop_id = setInterval(
+      function()
+      {
+          this.step(loop_id);
+      }.bind(this), this.get_delay());
   }
 
-  step()
+  step(loop_id)
   {
-    //console.log(this.get_game_state());
-    if(this.get_game_state() == GAMESTATE_ENUM.ingame)
+    if(this.get_apple() == null)
     {
-      if(this.get_apple() == null)
+      this.place_apple();
+    }
+    this.get_grid().set_cell_occupancy(this.get_snake().get_tail().get_row(), this.get_snake().get_tail().get_column(), CELL_STATUS.empty);
+    var moved = this.move_snake(this.get_player_direction());
+    if(moved)
+    {
+      let head = this.get_snake().get_head();
+      let tail = this.get_snake().get_tail();
+      if(this.get_grid().get_cell_occupancy(head.get_row(), head.get_column()) == CELL_STATUS.apple)
       {
-        this.place_apple();
-      }
-      var moved = this.move_snake(this.get_player_direction());
-      if(moved)
-      {
-        let head = this.get_snake().get_head();
-        let tail = this.get_snake().get_tail();
-        this.get_grid().set_cell_occupancy(head.get_row(), head.get_column(), CELL_STATUS.empty);
-        if(this.get_grid().get_cell_occupancy(head.get_row(), head.get_column()) == CELL_STATUS.apple)
+        this.set_apple(null);
+        let row = tail.get_row();
+        let column = tail.get_column();
+        switch(tail.get_direction())
         {
-          this.set_apple(null);
-          let row = tail.get_row();
-          let column = tail.get_column();
-          switch(tail.get_direction())
-          {
-            case DIRECTION.left:
-              column--;
-              break;
+          case DIRECTION.left:
+            column++;
+            break;
 
-            case DIRECTION.right:
-              column++;
-              break;
+          case DIRECTION.right:
+            column--;
+            break;
 
-            case DIRECTION.up:
-              row--;
-              break;
+          case DIRECTION.up:
+            row++;
+            break;
 
-            case DIRECTION.down:
-              row++;
-          }
-          this.get_snake().add_node(new SnakeNode(row, column, 'a'));
-          this.get_grid().set_cell_occupancy();
+          case DIRECTION.down:
+            row--;
         }
-        this.get_grid().set_cell_occupancy(head.get_row(), head.get_column(), CELL_STATUS.snake);
-        let win = this.is_win();
-        if(win)
-        {
-          this.set_game_state(GAMESTATE_ENUM.win);
-        }
+        this.get_snake().add_node(new SnakeNode(row, column, tail.get_direction()), 'a');
+        this.get_grid().set_cell_occupancy(row, column, CELL_STATUS.snake);
       }
-      else
+      this.get_grid().set_cell_occupancy(this.get_snake().get_head().get_row(), this.get_snake().get_head().get_column(), CELL_STATUS.snake);
+      let win = this.is_win();
+      if(win)
       {
-        this.set_game_state(GAMESTATE_ENUM.lose);
+        this.set_game_state(GAMESTATE_ENUM.win);
       }
+    }
+    else
+    {
+      this.set_game_state(GAMESTATE_ENUM.lose);
     }
   }
 
@@ -171,7 +172,7 @@ class Game
           break;
 
         case DIRECTION.right:
-          this.get_snake().get_head().set_row(this.get_snake().get_head().get_column() + 1);
+          this.get_snake().get_head().set_column(this.get_snake().get_head().get_column() + 1);
           break;
 
         case DIRECTION.up:
@@ -194,7 +195,6 @@ class Game
     switch(direction)
     {
       case DIRECTION.left:
-        console.log("LEFT");
         if(head_column - 1 < 0)
         {
           success = false;
@@ -206,7 +206,6 @@ class Game
         break;
 
       case DIRECTION.right:
-        console.log("RIGHT");
         if(head_column + 1 == this.get_grid().get_cells()[head_row].length)
         {
           success = false;
@@ -218,7 +217,6 @@ class Game
         break;
 
       case DIRECTION.up:
-        console.log("UP");
         if(head_row - 1 < 0)
         {
           success = false;
@@ -230,7 +228,6 @@ class Game
         break;
 
       case DIRECTION.down:
-        console.log("DOWN");
         if(head_row + 1 == this.get_grid().get_cells().length)
         {
           success = false;
@@ -258,7 +255,7 @@ class Game
     return true;
   }
 
-  key_handler(event)
+  direction_handler(event)
   {
     switch(event.which)
     {
@@ -276,10 +273,6 @@ class Game
 
       case 40:
         this.set_player_direction(DIRECTION.down);
-        break;
-
-      case 13:
-        this.set_game_state(GAMESTATE_ENUM.ingame);
     }
   }
 
@@ -302,6 +295,7 @@ class Game
           else if(j == number_of_columns - 1)
           {
             this.get_snake().add_node(new SnakeNode(i, j, DIRECTION.up), 'p');
+            this.set_player_direction(DIRECTION.left);
           }
           else
           {
@@ -310,7 +304,6 @@ class Game
           remaining_snake--;
           this.get_grid().set_cell_occupancy(i, j, CELL_STATUS.snake);
         }
-        this.set_player_direction(DIRECTION.left);
       }
       else
       {
@@ -323,6 +316,7 @@ class Game
           else if(j == 0)
           {
             this.get_snake().add_node(new SnakeNode(i, j, DIRECTION.up), 'p');
+            this.set_player_direction(DIRECTION.right);
           }
           else
           {
@@ -331,7 +325,6 @@ class Game
           remaining_snake--;
           this.get_grid().set_cell_occupancy(i, j, CELL_STATUS.snake);
         }
-        this.set_player_direction(DIRECTION.right);
       }
     }
   }
@@ -358,6 +351,16 @@ class Game
       CANVAS_CONTEXT.font = "bold " + font_size.toString() + "pt sans-serif";
       text_width = CANVAS_CONTEXT.measureText(message).width;
     }
+  }
+
+  activate_start_game_listener(event)
+  {
+      if(event.which == 13)
+      {
+        this.set_game_state(GAMESTATE_ENUM.ingame);
+        this.game_loop();
+        document.removeEventListener("keydown", this.start_game_function_ref);
+      }
   }
 
   get_canvas_width()
