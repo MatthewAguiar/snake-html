@@ -7,6 +7,28 @@ class Snake
     this.length = 0;
   }
 
+  add_node(node, order)
+  {
+    if(this.head == null && this.tail == null)
+    {
+      this.head = node;
+      this.tail = this.head;
+    }
+    else if(order == 'a')
+    {
+      this.tail.set_next(node);
+      node.set_previous(this.tail);
+      this.tail = node;
+    }
+    else if(order == 'p')
+    {
+      this.head.set_previous(node);
+      node.set_next(this.head);
+      this.head = node;
+    }
+    this.length++;
+  }
+
   get_length()
   {
     return this.length;
@@ -35,27 +57,5 @@ class Snake
   set_tail(tail)
   {
     this.tail = tail;
-  }
-
-  add_node(node, order)
-  {
-    if(this.head == null && this.tail == null)
-    {
-      this.head = node;
-      this.tail = this.head;
-    }
-    else if(order == 'a')
-    {
-      this.tail.set_next(node);
-      node.set_previous(this.tail);
-      this.tail = node;
-    }
-    else if(order == 'p')
-    {
-      this.head.set_previous(node);
-      node.set_next(this.head);
-      this.head = node;
-    }
-    this.length++;
   }
 }

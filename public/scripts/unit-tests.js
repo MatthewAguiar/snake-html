@@ -4,9 +4,9 @@ class UnitTester
   constructor(game_app)
   {
     this.game_app = game_app;
-    var test1 = this.test_adjust_canvas(16, 64, 16, 2048);
+    //var test1 = this.test_adjust_canvas(16, 64, 16, 2048);
   }
-
+/*
   test_adjust_canvas(min_cell_size, max_cell_size, min_canvas_size, max_canvas_size)
   {
     var canvas_size = 0;
@@ -24,5 +24,5 @@ class UnitTester
       }
       console.log("");
     }
-  }
+  }*/
 }

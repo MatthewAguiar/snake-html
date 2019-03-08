@@ -77,19 +77,24 @@ class Grid
     return this.get_cells()[row].length;
   }
 
+  /**
+  * @method filter_cells Produces a 2D array of coordinates filtering only the coordinates that contain a Cell that is of the specified occupancy type.
+  * @param occupancy The occupancy type to filter out.
+  * @return Return a 2D array that is either empty or containing sub-arrays of length 2. Index 0 = row coordinate, Index 1 = column coordinate
+  */
   filter_cells(occupancy)
   {
-    var random_coordinates = [];
-    for(let i = 0; i < this.get_cells().length; i++)
+    var coordinates = [];
+    for(let i = 0; i < this.get_number_of_rows(); i++)
     {
-      for(let j = 0; j < this.get_cells()[i].length; j++)
+      for(let j = 0; j < this.get_number_columns_in_row(i); j++)
       {
-        if(this.get_cell_occupancy(i, j) == occupancy)
+        if(this.get_cell_occupancy(i, j) == occupancy) //If the occupancy at the specific row and column is the occupancy state we want, push the information as an array of size 2 to the coordinate array.
         {
-          random_coordinates.push([i, j]);
+          coordinates.push([i, j]);
         }
       }
     }
-    return random_coordinates;
+    return coordinates; //Return the array of coordinate arrays.
   }
 }
