@@ -65,7 +65,6 @@ class Game
     ////// Setup Snake ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.set_snake(new Snake(colors));
     this.init_snake_onto_grid(this.get_starting_snake_length());
-    console.log(this.get_snake());
     ////// Place Apple ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.set_apple(null);
     this.place_apple();
@@ -151,6 +150,7 @@ class Game
       {
         this.set_apple(null); //If the head is now in a Cell that contains an apple, remove the apple.
         this.grow_snake(direction_of_tail_after_move, tail_row_after_move, tail_column_after_move); //Grow the snake.
+        this.get_snake().get_eat_sound().play();
       }
       this.get_grid().set_cell_occupant(head_row_after_move, head_column_after_move, this.get_snake().get_head()); //NOTE: Important to have this after checking for apple collision so it won't override the Cell.
       ////// Check for Win //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -6,8 +6,10 @@ class Snake
     this.head = this.tail = null;
     this.length = 0;
     this.color_queue = [];
+    this.eat_fx = null;
     this.set_color_queue(colors);
     this.shuffle_queue();
+    this.set_eat_sound(new Audio("audio/sound-effects/apple-bite.wav"));
   }
 
   add_node(node, order)
@@ -86,5 +88,15 @@ class Snake
       this.get_color_queue()[current_color_index] = this.get_color_queue()[swap_color_index];
       this.get_color_queue()[swap_color_index] = place_holder;
     }
+  }
+
+  get_eat_sound()
+  {
+    return this.eat_fx;
+  }
+
+  set_eat_sound(audio_object)
+  {
+    this.eat_fx = audio_object;
   }
 }
