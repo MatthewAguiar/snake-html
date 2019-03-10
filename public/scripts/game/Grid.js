@@ -57,14 +57,19 @@ class Grid
     return this.cells[row][column];
   }
 
-  get_cell_occupancy(row, column)
+  get_cell_occupant(row, column)
   {
-    return this.cells[row][column].get_occupancy();
+    return this.cells[row][column].get_occupant();
   }
 
-  set_cell_occupancy(row, column, status)
+  get_cell_occupancy_status(row, column)
   {
-    this.cells[row][column].set_occupancy(status);
+    return this.cells[row][column].get_occupancy_status();
+  }
+
+  set_cell_occupant(row, column, object)
+  {
+    this.cells[row][column].set_occupant(object);
   }
 
   get_number_of_rows()
@@ -89,7 +94,7 @@ class Grid
     {
       for(let j = 0; j < this.get_number_columns_in_row(i); j++)
       {
-        if(this.get_cell_occupancy(i, j) == occupancy) //If the occupancy at the specific row and column is the occupancy state we want, push the information as an array of size 2 to the coordinate array.
+        if(this.get_cell_occupancy_status(i, j) == occupancy) //If the occupancy at the specific row and column is the occupancy state we want, push the information as an array of size 2 to the coordinate array.
         {
           coordinates.push([i, j]);
         }

@@ -15,6 +15,7 @@ class SnakeNode extends Indexable
     var copy = new SnakeNode(this.get_row(), this.get_column(), this.get_direction());
     copy.set_previous(this.get_previous());
     copy.set_next(this.get_next());
+    copy.set_color(this.get_color());
     return copy;
   }
 

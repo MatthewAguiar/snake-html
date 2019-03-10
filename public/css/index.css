@@ -1,15 +1,12 @@
 
 body{
   background-image: url("../images/landing-page/title-background.jpg");
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
   display: flex;
   flex-flow: column;
 }
 
 header{
-  display: relative;
-  display: block;
+  position: relative;
   padding: 1%;
   text-align: center;
 }
@@ -20,8 +17,13 @@ header{
 }
 
 #start-button{
+  width: 8%;
   position: absolute;
   top: 50%;
+  left: 90%;
+  transform: translate(-50%, -50%);
+  font-weight: bolder;
+  font-size: 150%;
 }
 
 main{
@@ -49,29 +51,29 @@ h1{
   justify-content: space-around;
 }
 
-button{
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  padding: 1%;
-  font-family: "ZCOOL QingKe HuangYou", Helvetica, Arial;
-  transition: background-color 100ms, box-shadow 100ms;
-}
-
 button:focus{
   outline: 0;
 }
 
 .button{
   width: 25%;
-  height: auto;
-  box-shadow: 0px 0px 15px orange;
-  background-color: orange;
-  color: white;
-  font-size: 105%;
 }
 
-.button:hover{
+button{
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 1%;
+  box-shadow: 0px 0px 15px orange;
+  background-color: orange;
+  font-size: 105%;
+  height: auto;
+  color: white;
+  font-family: "ZCOOL QingKe HuangYou", Helvetica, Arial;
+  transition: background-color 100ms, box-shadow 100ms;
+}
+
+button:hover{
   background-color: rgb(242, 130, 44);
   box-shadow: 0px 0px 15px rgb(242, 130, 44);
 }
@@ -97,8 +99,8 @@ label{
 }
 
 #blue:hover{
-  background-color: darkblue;
-  box-shadow: 0px 0px 15px darkblue;
+  background-color: darkblue !important;
+  box-shadow: 0px 0px 15px darkblue !important;
 }
 
 #lightblue{
@@ -107,8 +109,8 @@ label{
 }
 
 #lightblue:hover{
-  background-color: rgb(107, 134, 142);
-  box-shadow: 0px 0px 15px rgb(107, 134, 142);
+  background-color: rgb(107, 134, 142) !important;
+  box-shadow: 0px 0px 15px rgb(107, 134, 142) !important;
 }
 
 #green{
@@ -117,8 +119,8 @@ label{
 }
 
 #green:hover{
-  background-color: rgb(0, 61, 0);
-  box-shadow: 0px 0px 15px rgb(0, 61, 0);
+  background-color: rgb(0, 61, 0) !important;
+  box-shadow: 0px 0px 15px rgb(0, 61, 0) !important;
 }
 
 #red{
@@ -127,8 +129,8 @@ label{
 }
 
 #red:hover{
-  background-color: rgb(81, 0, 0);
-  box-shadow: 0px 0px 15px rgb(81, 0, 0);
+  background-color: rgb(81, 0, 0) !important;
+  box-shadow: 0px 0px 15px rgb(81, 0, 0) !important;
 }
 
 #yellow{
@@ -137,8 +139,8 @@ label{
 }
 
 #yellow:hover{
-  background-color: rgb(84, 84, 0);
-  box-shadow: 0px 0px 15px rgb(84, 84, 0);
+  background-color: rgb(84, 84, 0) !important;
+  box-shadow: 0px 0px 15px rgb(84, 84, 0) !important;
 }
 
 #orange{
@@ -147,8 +149,8 @@ label{
 }
 
 #orange:hover{
-  background-color: rgb(122, 78, 0);
-  box-shadow: 0px 0px 15px rgb(122, 78, 0);
+  background-color: rgb(122, 78, 0) !important;
+  box-shadow: 0px 0px 15px rgb(122, 78, 0) !important;
 }
 
 #purple{
@@ -157,8 +159,8 @@ label{
 }
 
 #purple:hover{
-  background-color: rgb(53, 0, 53);
-  box-shadow: 0px 0px 15px rgb(53, 0, 53);
+  background-color: rgb(53, 0, 53) !important;
+  box-shadow: 0px 0px 15px rgb(53, 0, 53) !important;
 }
 
 #neon{
@@ -167,8 +169,8 @@ label{
 }
 
 #neon:hover{
-  background-color: rgb(56, 96, 0);
-  box-shadow: 0px 0px 15px rgb(56, 96, 0);
+  background-color: rgb(56, 96, 0) !important;
+  box-shadow: 0px 0px 15px rgb(56, 96, 0) !important;
 }
 
 #white{
@@ -177,8 +179,8 @@ label{
 }
 
 #white:hover{
-  background-color: grey;
-  box-shadow: 0px 0px 15px grey;
+  background-color: grey !important;
+  box-shadow: 0px 0px 15px grey !important;
 }
 
 #black{
@@ -187,5 +189,5 @@ label{
 }
 
 #black:hover{
-  box-shadow: 0px 0px 15px white;
+  box-shadow: 0px 0px 15px white !important;
 }

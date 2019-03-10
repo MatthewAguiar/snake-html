@@ -4,6 +4,7 @@ class Indexable
   {
     this.row = row;
     this.column = column;
+    this.color = "";
   }
 
   get_row()
@@ -24,5 +25,15 @@ class Indexable
   set_column(column)
   {
     this.column = column;
+  }
+
+  get_color()
+  {
+    return this.color;
+  }
+
+  set_color(color)
+  {
+    this.color = color;
   }
 }

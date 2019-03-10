@@ -1,10 +1,13 @@
 
 class Snake
 {
-  constructor()
+  constructor(colors)
   {
     this.head = this.tail = null;
     this.length = 0;
+    this.color_queue = [];
+    this.set_color_queue(colors);
+    this.shuffle_queue();
   }
 
   add_node(node, order)
@@ -14,18 +17,13 @@ class Snake
       this.head = node;
       this.tail = this.head;
     }
-    else if(order == 'a')
+    else
     {
       this.tail.set_next(node);
       node.set_previous(this.tail);
       this.tail = node;
     }
-    else if(order == 'p')
-    {
-      this.head.set_previous(node);
-      node.set_next(this.head);
-      this.head = node;
-    }
+    node.set_color(this.get_next_color());
     this.length++;
   }
 
@@ -57,5 +55,36 @@ class Snake
   set_tail(tail)
   {
     this.tail = tail;
+  }
+
+  get_next_color()
+  {
+    let color = this.get_color_queue().shift();
+    this.get_color_queue().push(color);
+    return color;
+  }
+
+  get_color_queue()
+  {
+    return this.color_queue;
+  }
+
+  set_color_queue(colors)
+  {
+    this.color_queue = colors;
+  }
+
+  shuffle_queue()
+  {
+    let current_color_index, swap_color_index, place_holder;
+    swap_color_index = 0;
+    place_holder = "";
+    for(current_color_index = this.get_color_queue().length - 1; current_color_index > 0; current_color_index--)
+    {
+      swap_color_index = Math.floor(Math.random() * (current_color_index + 1));
+      place_holder = this.get_color_queue()[current_color_index];
+      this.get_color_queue()[current_color_index] = this.get_color_queue()[swap_color_index];
+      this.get_color_queue()[swap_color_index] = place_holder;
+    }
   }
 }

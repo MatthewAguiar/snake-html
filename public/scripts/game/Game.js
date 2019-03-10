@@ -12,7 +12,7 @@ class Game
   * @param cell_size The size of the cells in the canvas.
   * @param delay The delay in milliseconds, the game should wait before processing another game-step.
   */
-  constructor(snake_length, cell_size, delay)
+  constructor(snake_length, cell_size, speed, colors, background, music)
   {
     ////// Initialize Instance Variables /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.cell_size = -1;
@@ -30,11 +30,15 @@ class Game
     this.loss_message = "";
     this.font_size = -1; //pt.
     this.starting_snake_length = -1;
+    this.background = "";
+    this.music = "";
     ////// Adjust Canvas Dimensions //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.set_cell_size(cell_size);
     this.resize_canvas_dimensions(this.get_cell_size());
+    this.set_background(background);
+    this.set_music(music);
     ////// Set Delay /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.set_delay(delay);
+    this.set_delay(speed);
     ////// Setup Key Listeners ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.set_start_game_function_reference(this.handle_start_game_listener.bind(this));
     this.activate_start_game_listener();
@@ -47,20 +51,21 @@ class Game
     this.adjust_font(this.get_welcome_message(), this.get_canvas_width() * 0.1); //Make the padding 10% of the canvas' width.
     ////// Initialize all Game Pieces ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.set_starting_snake_length(snake_length);
-    this.init_game_pieces();
+    this.init_game_pieces(colors);
     ////// Begin Animation Loop //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.animation();
   }
 
-  init_game_pieces()
+  init_game_pieces(colors)
   {
     ////// Set Initial Direction /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.set_player_direction(DIRECTION.right);
     ////// Instantiate Grid //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.set_grid(new Grid(this.get_cell_size()));
     ////// Setup Snake ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.set_snake(new Snake());
+    this.set_snake(new Snake(colors));
     this.init_snake_onto_grid(this.get_starting_snake_length());
+    console.log(this.get_snake());
     ////// Place Apple ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     this.set_apple(null);
     this.place_apple();
@@ -130,7 +135,7 @@ class Game
     let direction_of_tail_after_move = undefined;
     let moved = false;
     ////// Attempt Move with Snake ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    moved = this.move_snake(this.get_player_direction())
+    moved = this.move_snake(this.get_player_direction());
     if(moved)
     {
       ////// Get Head and Tail Data after Move ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -140,14 +145,14 @@ class Game
       tail_column_after_move = this.get_snake().get_tail().get_column();
       direction_of_tail_after_move = this.get_snake().get_tail().get_direction();
       ////// Free up the Cell the Tail was Previously /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      this.get_grid().set_cell_occupancy(tail_row_before_move, tail_column_before_move, CELL_STATUS.empty); //Set the Cell tail before the movement to be empty since our snake has moved.
+      this.get_grid().set_cell_occupant(tail_row_before_move, tail_column_before_move, null); //Set the Cell tail before the movement to be empty since our snake has moved.
       ////// Check for Collision with Apple ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      if(this.get_grid().get_cell_occupancy(head_row_after_move, head_column_after_move) == CELL_STATUS.apple)
+      if(this.get_grid().get_cell_occupancy_status(head_row_after_move, head_column_after_move) == CELL_STATUS.apple)
       {
         this.set_apple(null); //If the head is now in a Cell that contains an apple, remove the apple.
         this.grow_snake(direction_of_tail_after_move, tail_row_after_move, tail_column_after_move); //Grow the snake.
       }
-      this.get_grid().set_cell_occupancy(head_row_after_move, head_column_after_move, CELL_STATUS.snake); //NOTE: Important to have this after checking for apple collision so it won't override the Cell.
+      this.get_grid().set_cell_occupant(head_row_after_move, head_column_after_move, this.get_snake().get_head()); //NOTE: Important to have this after checking for apple collision so it won't override the Cell.
       ////// Check for Win //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       let apple_placed = this.place_apple(); //Place the apple either because the game just started or it has been eaten. This function will NOT place a new apple if one already exists.
       if(!apple_placed)
@@ -188,7 +193,7 @@ class Game
         let row = chosen_coordinates[0];
         let column = chosen_coordinates[1];
         this.set_apple(new Apple(row, column));
-        this.get_grid().set_cell_occupancy(row, column, CELL_STATUS.apple);
+        this.get_grid().set_cell_occupant(row, column, this.get_apple());
       }
       else
       {
@@ -213,6 +218,7 @@ class Game
       {
         let copy_of_current_node = node.copy();
         node.copy_properties_from_node(previous_node);
+        this.get_grid().set_cell_occupant(node.get_row(), node.get_column(), node); //Set the Cell tail before the movement to be empty since our snake has moved.
         node = node.get_next();
         previous_node = copy_of_current_node;
       }
@@ -256,7 +262,7 @@ class Game
           {
             success = false;
           }
-          else if(this.get_grid().get_cell_occupancy(head_row, head_column - 1) == CELL_STATUS.snake)
+          else if(this.get_grid().get_cell_occupancy_status(head_row, head_column - 1) == CELL_STATUS.snake)
           {
             success = false;
           }
@@ -268,7 +274,7 @@ class Game
         {
           success = false;
         }
-        else if(this.get_grid().get_cell_occupancy(head_row, head_column + 1) == CELL_STATUS.snake)
+        else if(this.get_grid().get_cell_occupancy_status(head_row, head_column + 1) == CELL_STATUS.snake)
         {
           success = false;
         }
@@ -279,7 +285,7 @@ class Game
         {
           success = false;
         }
-        else if(this.get_grid().get_cell_occupancy(head_row - 1, head_column) == CELL_STATUS.snake)
+        else if(this.get_grid().get_cell_occupancy_status(head_row - 1, head_column) == CELL_STATUS.snake)
         {
           success = false;
         }
@@ -290,7 +296,7 @@ class Game
         {
           success = false;
         }
-        else if(this.get_grid().get_cell_occupancy(head_row + 1, head_column) == CELL_STATUS.snake)
+        else if(this.get_grid().get_cell_occupancy_status(head_row + 1, head_column) == CELL_STATUS.snake)
         {
           success = false;
         }
@@ -340,7 +346,7 @@ class Game
         tail_row--;
     }
     this.get_snake().add_node(new SnakeNode(tail_row, tail_column, direction_of_tail), 'a');
-    this.get_grid().set_cell_occupancy(tail_row, tail_column, CELL_STATUS.snake);
+    this.get_grid().set_cell_occupant(tail_row, tail_column, this.get_snake().get_tail());
   }
 
   direction_handler(event)
@@ -366,52 +372,65 @@ class Game
 
   init_snake_onto_grid(snake_length)
   {
-    let remaining_snake = snake_length;
     let number_of_rows = this.get_grid().get_number_of_rows();
     let number_of_columns = -1;
-    for(let i = number_of_rows - 1; i >= 0 ; i--)
+    let remaining_cells = number_of_rows * this.get_grid().get_number_columns_in_row(0);
+    let lay_snake = false;
+    for(let i = 0; i < number_of_rows; i++)
     {
       number_of_columns = this.get_grid().get_number_columns_in_row(i);
-      if(this.get_player_direction() == DIRECTION.right)
+      if(this.get_player_direction() == DIRECTION.left)
       {
         for(let j = 0; j < number_of_columns; j++)
         {
-          if(remaining_snake == 0)
+          if(remaining_cells == snake_length)
           {
-            break;
+            lay_snake = true;
           }
-          else if(j == number_of_columns - 1)
+          if(lay_snake)
           {
-            this.get_snake().add_node(new SnakeNode(i, j, DIRECTION.up), 'p');
-            this.set_player_direction(DIRECTION.left);
+            if(j == 0 && i > 0)
+            {
+              this.get_snake().add_node(new SnakeNode(i, j, DIRECTION.up));
+            }
+            else
+            {
+              this.get_snake().add_node(new SnakeNode(i, j, this.get_player_direction()));
+            }
           }
-          else
+          if(j == number_of_columns - 1)
           {
-            this.get_snake().add_node(new SnakeNode(i, j, this.get_player_direction()), 'p');
+            this.set_player_direction(DIRECTION.right);
           }
-          remaining_snake--;
-          this.get_grid().set_cell_occupancy(i, j, CELL_STATUS.snake);
+          this.get_grid().set_cell_occupant(i, j, this.get_snake().get_tail());
+          remaining_cells--;
         }
       }
       else
       {
         for(let j = number_of_columns - 1; j >= 0; j--)
         {
-          if(remaining_snake == 0)
+          if(remaining_cells == snake_length)
           {
-            break;
+            lay_snake = true;
           }
-          else if(j == 0)
+          if(lay_snake)
           {
-            this.get_snake().add_node(new SnakeNode(i, j, DIRECTION.up), 'p');
-            this.set_player_direction(DIRECTION.right);
+            if(j == number_of_columns - 1)
+            {
+              this.get_snake().add_node(new SnakeNode(i, j, DIRECTION.up));
+            }
+            else
+            {
+              this.get_snake().add_node(new SnakeNode(i, j, this.get_player_direction()));
+            }
           }
-          else
+          if(j == 0 && i != number_of_rows - 1)
           {
-            this.get_snake().add_node(new SnakeNode(i, j, this.get_player_direction()), 'p');
+            this.set_player_direction(DIRECTION.left);
           }
-          remaining_snake--;
-          this.get_grid().set_cell_occupancy(i, j, CELL_STATUS.snake);
+          this.get_grid().set_cell_occupant(i, j, this.get_snake().get_tail());
+          remaining_cells--;
         }
       }
     }
@@ -428,7 +447,7 @@ class Game
       {
         if(this.get_game_state() == GAMESTATE_ENUM.lose || this.get_game_state() == GAMESTATE_ENUM.win)
         {
-          this.init_game_pieces(this.get_grid().get_cell_size());
+          this.init_game_pieces(this.get_snake().get_color_queue());
         }
         this.set_game_state(GAMESTATE_ENUM.ingame);
         this.game_loop();
@@ -648,5 +667,31 @@ class Game
   set_starting_snake_length(snake_length)
   {
     this.starting_snake_length = snake_length;
+  }
+
+  get_background()
+  {
+    return this.background;
+  }
+
+  set_background(background)
+  {
+    document.body.style.backgroundImage = "url(" + background + ")";
+    this.background = background;
+  }
+
+  get_music()
+  {
+    return this.background;
+  }
+
+  set_music(music)
+  {
+    let embed_tag = document.createElement("embed");
+    embed_tag.src = music;
+    embed_tag.autoplay = true;
+    embed_tag.loop = true;
+    document.body.insertBefore(embed_tag, document.getElementById("game-window"));
+    this.music = music
   }
 }
