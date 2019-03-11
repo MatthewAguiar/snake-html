@@ -1,9 +1,3 @@
-/*
-Snake: Game Javascript
-Copyright (C) 2019 Matthew Aguiar
-Notes: The snake game was originally invented in 1997 by Nokia. This is my personal Javascript adaptation of the game.
-*/
-
 class Game
 {
   /**
@@ -666,6 +660,11 @@ class Game
 
   set_starting_snake_length(snake_length)
   {
+    let number_of_cells = (CANVAS.width / this.get_cell_size()) * (CANVAS.height / this.get_cell_size());
+    if(snake_length >= number_of_cells)
+    {
+      snake_length = number_of_cells - 1;
+    }
     this.starting_snake_length = snake_length;
   }
 

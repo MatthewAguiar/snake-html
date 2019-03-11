@@ -1,27 +1,27 @@
-
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head> <!-- Mark Tab Title and Link Stylesheets --------------------------------------------------------------------------------------------------------------------------------->
     <meta charset="utf-8">
     <title>Create your own Snake Game</title>
+    <link href = "images/tab-icon.png" rel = "icon" type = "image/x-icon">
     <link rel = "stylesheet" href = "css/global-styles.css">
     <link href="https://fonts.googleapis.com/css?family=ZCOOL+QingKe+HuangYou" rel="stylesheet">
     <link rel = "stylesheet" href = "css/index.css">
   </head>
   <body> <!-- Mark Body ----------------------------------------------------------------------------------------------------------------------------------------------------------->
-    <header> <!-- Place the Title Image as the Header ----------------------------------------------------------------------------------------------------------------------------->
+    <header id = "page-header"> <!-- Place the Title Image as the Header ----------------------------------------------------------------------------------------------------------------------------->
       <embed id = "background-music" src = "audio/music/landing-page/title-music.mp3" controls loop = "true"></embed>
-      <img id = "title" src = "images/landing-page/title.png">
-      <button id = "start-button" type = "button">PLAY</button>
+      <img id = "title-banner" src = "images/landing-page/title.png">
+      <button id = "play-button" class = "orange-button" type = "button">PLAY</button>
     </header>
-    <main> <!-- Mark the Main Part of the Title Page ------------------------------------------------------------------------------------------------------------------------------>
+    <main id = "main-content"> <!-- Mark the Main Part of the Title Page ------------------------------------------------------------------------------------------------------------------------------>
       <div id = options-box> <!-- Invisible Box Containing all Settings ----------------------------------------------------------------------------------------------------------->
         <div class = "option">  <!-- Speed Option --------------------------------------------------------------------------------------------------------------------------------->
           <h1>Snake Speed</h1>
           <div class = "selections-flexbox">
-            <button id = "slow" class = "speed-option button" type = "button">Slow</button>
-            <button id = "medium" class = "speed-option button" type="button">Medium</button>
-            <button id = "fast" class = "speed-option button" type="button">Fast</button>
+            <button id = "slow" class = "speed-option option-button orange-button" type = "button">Slow</button>
+            <button id = "medium" class = "speed-option option-button orange-button" type="button">Medium</button>
+            <button id = "fast" class = "speed-option option-button orange-button" type="button">Fast</button>
           </div>
         </div>
         <div id = "colors" class = "option"> <!-- Colors Option ------------------------------------------------------------------------------------------------------------------->
@@ -42,26 +42,26 @@
         <div class = "option"> <!-- Background Option ------------------------------------------------------------------------------------------------------------------------------>
           <h1>Background</h1>
           <div class = "selections-flexbox">
-            <button id = "no-background-button" class = "background-option button" type="button">No Background</button>
-            <button id = "spiral-background-button" class = "background-option button" type="button">SPIRAL</button>
+            <button id = "no-background-button" class = "background-option option-button orange-button" type="button">No Background</button>
+            <button id = "spiral-background-button" class = "background-option option-button orange-button" type="button">SPIRAL</button>
             <div>
-              <label for = "custom-background">Photo Link:</label>
-              <input id = "custom-background" type = "text" placeholder = "http://">
+              <label id = "custom-background-label" for = "custom-background-input">Photo Link:</label>
+              <input id = "custom-background-input" type = "text" placeholder = "http://">
             </div>
           </div>
         </div>
         <div class = "option"> <!-- Music Option ----------------------------------------------------------------------------------------------------------------------------------->
           <h1>Music</h1>
           <div class = "selections-flexbox">
-            <button id = "relaxing-button" class = "music-option button" type="button">Relaxing</button>
-            <button id = "mild-button" class = "music-option button" type="button">Mild</button>
-            <button id = "intense-button" class = "music-option button" type="button">Intense</button>
+            <button id = "relaxing-button" class = "music-option option-button orange-button" type="button">Relaxing</button>
+            <button id = "mild-button" class = "music-option option-button orange-button" type="button">Mild</button>
+            <button id = "intense-button" class = "music-option option-button orange-button" type="button">Intense</button>
           </div>
         </div>
       </div>
     </main>
-
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <!-- SCRIPTS!!! ---------------------------------------------------------------------------------------------------------------------------------------------------------------->
+    <script src = "https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src = "scripts/globals.js" type="text/javascript"></script>
     <script src = "scripts/title/index.js" type="text/javascript"></script>
   </body>

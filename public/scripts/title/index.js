@@ -4,10 +4,10 @@ function init_button_group($button_set)
   $button_set.on("click",
     function()
     {
-      $button_set.css("background-color", "orange");
-      $button_set.css("box-shadow", "0px 0px 15px orange");
-      $(this).css("background-color", "rgb(48, 193, 29)");
-      $(this).css("box-shadow", "0px 0px 15px rgb(48, 193, 29)");
+      $button_set.removeClass("green-button");
+      $button_set.addClass("orange-button");
+      $(this).removeClass("orange-button");
+      $(this).addClass("green-button");
     });
 }
 
@@ -152,9 +152,9 @@ let $color_options = $(".color-option");
 let number_of_colors = $color_options.length;
 let color_selected_array = [];
 let $background_options = $(".background-option");
-let $web_background = $("#custom-background");
+let $web_background = $("#custom-background-input");
 let $music_options = $(".music-option");
-let $play_button = $("#start-button");
+let $play_button = $("#play-button");
 init_button_group($speed_options);
 init_button_group($background_options);
 init_button_group($music_options);

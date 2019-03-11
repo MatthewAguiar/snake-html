@@ -1,10 +1,10 @@
-
+/*Center the main canvas / game window in the center of the browser.*/
 #game-window{
   width: 85%;
   height: 85%;
+  border: 3px solid black;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border: 3px solid black;
 }
