@@ -3,8 +3,8 @@
 /**
 * @function save
 * @description The save method is called to store a key and an associated value in the browser's localStorage.
-* @param key The key with which to save the value to in the localStorage.
-* @param value The value being stored in the key.
+* @param {number|string} key The key with which to save the value to in the localStorage.
+* @param {number|string} value The value being stored in the key.
 */
 function save(key, value)
 {
@@ -13,8 +13,8 @@ function save(key, value)
 /**
 * @function load
 * @description The load function will retrive the value associated with a particular key.
-* @param key The key with which to load the value from.
-* @return Return the value of a particular key.
+* @param {number|string} key The key with which to load the value from.
+* @return {number|string} Return the value of a particular key.
 */
 function load(key)
 {
@@ -24,7 +24,7 @@ function load(key)
 /**
 * @function remove
 * @description The remove function will remove any key / value pair from localStorage.
-* @param key The key of the pair to be removed.
+* @param {number|string} key The key of the pair to be removed.
 */
 function remove(key)
 {

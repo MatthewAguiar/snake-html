@@ -1,10 +1,14 @@
+/**
+* A class representing the main Game / Application. It controls everything that happens and when those occurences happen.
+* @class
+*/
 class Game
 {
   /**
   * @constructor This constructor sets up ALL of the games essential data.
-  * @param snake_length The initial length of the snake.
-  * @param cell_size The size of the cells in the canvas.
-  * @param delay The delay in milliseconds, the game should wait before processing another game-step.
+  * @param {natural} snake_length The initial length of the snake.
+  * @param {natural} cell_size The size of the cells in the canvas.
+  * @param {natural} delay The delay in milliseconds, the game should wait before processing another game-step.
   */
   constructor(snake_length, cell_size, speed, colors, background, music)
   {
@@ -130,6 +134,7 @@ class Game
     let tail_row_before_move = this.get_snake().get_tail().get_row();
     let tail_column_before_move = this.get_snake().get_tail().get_column();
     let head_row_after_move = -1;
+    let head_column_after_move = -1;
     let direction_of_tail_after_move = undefined;
     let moved = false;
     ////// Attempt Move with Snake ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -367,7 +372,7 @@ class Game
       case DIRECTION.down:
         tail_row--;
     }
-    this.get_snake().add_node(new SnakeNode(tail_row, tail_column, direction_of_tail); //Add the new SnakeNode onto the end of the snake given the current tail's properties!
+    this.get_snake().add_node(new SnakeNode(tail_row, tail_column, tail_direction)); //Add the new SnakeNode onto the end of the snake given the current tail's properties!
     this.get_grid().set_cell_occupant(tail_row, tail_column, this.get_snake().get_tail()); //Update grid status as well.
   }
 

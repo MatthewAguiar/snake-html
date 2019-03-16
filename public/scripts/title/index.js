@@ -2,7 +2,7 @@
 /**
 * @function init_orange_button_group
 * @description This function is used to define the properties of all orange buttons in index.html as far as changing colors when clicked.
-* @param $button_collection This is the collection of buttons to apply the "click" listener to.
+* @param {Array} $button_collection This is the collection of buttons to apply the "click" listener to.
 */
 function init_orange_button_group($button_collection)
 {
@@ -59,7 +59,7 @@ function init_color_buttons()
 /**
 * @function color_is_chosen
 * @description Checks if a color has actually been chosen from the collection of buttons.
-* @return Return a boolean that indeicates if at least one color has been chosen from the array.
+* @return {boolean} Return a boolean that indeicates if at least one color has been chosen from the array.
 */
 function color_is_chosen()
 {
@@ -78,7 +78,7 @@ function color_is_chosen()
 /**
 * @function is_custom_background
 * @description Checks if their exists text in the "Photo Link" input box and returns true if their is.
-* @return Return a boolean, true if their is text in the "Photo Link" input or false if not.
+* @return {boolean} Return a boolean, true if their is text in the "Photo Link" input or false if not.
 */
 function is_custom_background()
 {
