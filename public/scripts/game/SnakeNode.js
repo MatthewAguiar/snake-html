@@ -9,7 +9,6 @@ class SnakeNode extends Indexable
     this.previous = null;
   }
 
-//TODO: SOMETIMES NULL
   copy()
   {
     var copy = new SnakeNode(this.get_row(), this.get_column(), this.get_direction());

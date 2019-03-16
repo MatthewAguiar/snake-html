@@ -130,9 +130,6 @@ class Game
     let tail_row_before_move = this.get_snake().get_tail().get_row();
     let tail_column_before_move = this.get_snake().get_tail().get_column();
     let head_row_after_move = -1;
-    let head_column_after_move = -1
-    let tail_row_after_move = -1;
-    let tail_column_after_move = -1;
     let direction_of_tail_after_move = undefined;
     let moved = false;
     ////// Attempt Move with Snake ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,8 +139,6 @@ class Game
       ////// Get Head and Tail Data after Move ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       head_row_after_move = this.get_snake().get_head().get_row();
       head_column_after_move = this.get_snake().get_head().get_column();
-      tail_row_after_move = this.get_snake().get_tail().get_row();
-      tail_column_after_move = this.get_snake().get_tail().get_column();
       direction_of_tail_after_move = this.get_snake().get_tail().get_direction();
       ////// Free up the Cell the Tail was Previously /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       this.get_grid().set_cell_occupant(tail_row_before_move, tail_column_before_move, null); //Set the Cell tail before the movement to be empty since our snake has moved.
@@ -151,7 +146,7 @@ class Game
       if(this.get_grid().get_cell_occupancy_status(head_row_after_move, head_column_after_move) == CELL_STATUS.apple)
       {
         this.set_apple(null); //If the head is now in a Cell that contains an apple, remove the apple.
-        this.grow_snake(direction_of_tail_after_move, tail_row_after_move, tail_column_after_move); //Grow the snake.
+        this.grow_snake(); //Grow the snake.
         this.get_snake().get_eat_sound().play();
       }
       this.get_grid().set_cell_occupant(head_row_after_move, head_column_after_move, this.get_snake().get_head()); //NOTE: Important to have this after checking for apple collision so it won't override the Cell.
@@ -219,20 +214,21 @@ class Game
   */
   move_snake(direction)
   {
-    direction = this.force_non_reverse(direction); //Do not allow the 
-    let success = this.move_is_valid(direction);
+    direction = this.force_non_reverse(direction); //Do not allow the snake to reverse! Would cause a loss that is not fair.
+    let success = this.move_is_valid(direction); //Is the move valid?
     if(success)
     {
-      let node = this.get_snake().get_head().get_next();
-      let previous_node = this.get_snake().get_head();
+      let node = this.get_snake().get_head().get_next(); //Get the SnakeNode after the head.
+      let previous_node = this.get_snake().get_head(); //Get the head.
       for(let i = 1; i < this.get_snake().get_length(); i++)
       {
-        let copy_of_current_node = node.copy();
-        node.copy_properties_from_node(previous_node);
+        let copy_of_current_node = node.copy(); //Make a deep copy of the current node as it will now have its properties manipulated.
+        node.copy_properties_from_node(previous_node); //Copy the properties (row, column, direction) from the previous SnakeNode to the next!
         this.get_grid().set_cell_occupant(node.get_row(), node.get_column(), node); //Set the Cell tail before the movement to be empty since our snake has moved.
-        node = node.get_next();
-        previous_node = copy_of_current_node;
+        node = node.get_next(); //Get the next SnakeNode.
+        previous_node = copy_of_current_node; //Save the deepcopy of the node that was just changed so that the original info may be copied to the next node.
       }
+      //Now move the head in the proper direction by changing its row or column by 1. This is after all SnakeNodes have had their properties shifted down 1.
       switch(direction)
       {
         case DIRECTION.left:
@@ -250,7 +246,7 @@ class Game
         case DIRECTION.down:
           this.get_snake().get_head().set_row(this.get_snake().get_head().get_row() + 1);
       }
-      this.get_snake().get_head().set_direction(direction);
+      this.get_snake().get_head().set_direction(direction); //Reset the head to its NEW direciton.
     }
     return success;
   }
@@ -270,16 +266,13 @@ class Game
     switch(direction)
     {
       case DIRECTION.left:
-        if(this.get_snake() != DIRECTION.right)
+        if(head_column - 1 < 0)
         {
-          if(head_column - 1 < 0)
-          {
-            success = false;
-          }
-          else if(this.get_grid().get_cell_occupancy_status(head_row, head_column - 1) == CELL_STATUS.snake)
-          {
-            success = false;
-          }
+          success = false;
+        }
+        else if(this.get_grid().get_cell_occupancy_status(head_row, head_column - 1) == CELL_STATUS.snake)
+        {
+          success = false;
         }
         break;
 
@@ -318,9 +311,16 @@ class Game
     return success;
   }
 
+  /**
+  * @method force_non_reverse
+  * @description In order to not accidentally run in the opposite direction of current motion and lose, this function changes the input direction to the opposite direction if needed.
+  * @param {DIRECTION} direciton The desired direction to move in.
+  * @return {DIRECTION} Returns the direction the snake will be moving in so that it will not crash back in on itself.
+  */
   force_non_reverse(direction)
   {
     let snake_head_direction = this.get_snake().get_head().get_direction();
+    //Simply compare the desired direction with the direction of the snake's head and deternmine if the returned diection must be flipped.
     if(snake_head_direction == DIRECTION.right && direction == DIRECTION.left)
     {
       direction = DIRECTION.right;
@@ -340,9 +340,17 @@ class Game
     return direction;
   }
 
-  grow_snake(direction_of_tail, tail_row, tail_column)
+  /**
+  * @method grow_snake
+  * @description Appends a new SnakeNode onto the end of the snake.
+  */
+  grow_snake()
   {
-    switch(direction_of_tail)
+    //Store tail properties in variables to properly attach a new tail.
+    let tail_direction = this.get_snake().get_tail().get_direction();
+    let tail_row = this.get_snake().get_tail().get_row();
+    let tail_column = this.get_snake().get_tail().get_column();
+    switch(tail_direction)
     {
       case DIRECTION.left:
         tail_column++;
@@ -359,10 +367,15 @@ class Game
       case DIRECTION.down:
         tail_row--;
     }
-    this.get_snake().add_node(new SnakeNode(tail_row, tail_column, direction_of_tail), 'a');
-    this.get_grid().set_cell_occupant(tail_row, tail_column, this.get_snake().get_tail());
+    this.get_snake().add_node(new SnakeNode(tail_row, tail_column, direction_of_tail); //Add the new SnakeNode onto the end of the snake given the current tail's properties!
+    this.get_grid().set_cell_occupant(tail_row, tail_column, this.get_snake().get_tail()); //Update grid status as well.
   }
 
+  /**
+  * @method direction_handler
+  * @description This function sets the Game object's direction variables to the keyboard input.
+  * @param {event} event This object contains information about an event which is a keypress here. We can extract info from it such as what key was pressed.
+  */
   direction_handler(event)
   {
     switch(event.which)
@@ -384,6 +397,11 @@ class Game
     }
   }
 
+  /**
+  * @method init_snake_onto_grid
+  * @description Takes the starting length of the snake and creates the SnakeNodes as well as updating the grid.
+  * @param {natural} snake_length The length of a snake.
+  */
   init_snake_onto_grid(snake_length)
   {
     let number_of_rows = this.get_grid().get_number_of_rows();
@@ -397,7 +415,7 @@ class Game
       {
         for(let j = 0; j < number_of_columns; j++)
         {
-          if(remaining_cells == snake_length)
+          if(remaining_cells == snake_length) //Once the remaining cells is equal to the number of SnakeNodes needing to be layed set the snake_lay var to true.
           {
             lay_snake = true;
           }
@@ -405,16 +423,16 @@ class Game
           {
             if(j == 0 && i > 0)
             {
-              this.get_snake().add_node(new SnakeNode(i, j, DIRECTION.up));
+              this.get_snake().add_node(new SnakeNode(i, j, DIRECTION.up)); //If the snake is in a left corner except for at the top of the grid, make that node move up.
             }
             else
             {
-              this.get_snake().add_node(new SnakeNode(i, j, this.get_player_direction()));
+              this.get_snake().add_node(new SnakeNode(i, j, this.get_player_direction())); //Otherwise just set the direction to the current Game direction.
             }
           }
           if(j == number_of_columns - 1)
           {
-            this.set_player_direction(DIRECTION.right);
+            this.set_player_direction(DIRECTION.right); //If we've reached the last column in a row, change the Game's direction.
           }
           this.get_grid().set_cell_occupant(i, j, this.get_snake().get_tail());
           remaining_cells--;
@@ -426,22 +444,22 @@ class Game
         {
           if(remaining_cells == snake_length)
           {
-            lay_snake = true;
+            lay_snake = true; //Once the remaining cells is equal to the number of SnakeNodes needing to be layed set the snake_lay var to true.
           }
           if(lay_snake)
           {
             if(j == number_of_columns - 1)
             {
-              this.get_snake().add_node(new SnakeNode(i, j, DIRECTION.up));
+              this.get_snake().add_node(new SnakeNode(i, j, DIRECTION.up)); //If the SnakeNode is to be added to the last column in a row, that node must move UP.
             }
             else
             {
-              this.get_snake().add_node(new SnakeNode(i, j, this.get_player_direction()));
+              this.get_snake().add_node(new SnakeNode(i, j, this.get_player_direction())); //Otherwise just set the direction to the current Game direction.
             }
           }
           if(j == 0 && i != number_of_rows - 1)
           {
-            this.set_player_direction(DIRECTION.left);
+            this.set_player_direction(DIRECTION.left); //Once the first column is hit change the Game's direction.
           }
           this.get_grid().set_cell_occupant(i, j, this.get_snake().get_tail());
           remaining_cells--;
@@ -450,11 +468,19 @@ class Game
     }
   }
 
+  /**
+  * @method activate_start_game_listener
+  * @description This will activate the state of game event listener that listens for the ENTER key.
+  */
   activate_start_game_listener()
   {
     document.addEventListener("keydown", this.get_start_game_function_reference());
   }
 
+  /**
+  * @method handle_start_game_listener
+  * @param {event} event The event that contains information about a keypress such as which one was pressed.
+  */
   handle_start_game_listener(event)
   {
       if(event.which == 13)
@@ -468,13 +494,11 @@ class Game
         document.removeEventListener("keydown", this.get_start_game_function_reference());
       }
   }
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ////// Canvas Methods /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   /**
   * @method resize_canvas_dimensions
   * @description This method is used to dynamically resize the canvas so that the dimensions of the canvas a divisible by how many rows and columns there are.
-  * @param cell_size The size of the cell to adjust to.
+  * @param {natural} cell_size The size of the cell to adjust to.
   */
   resize_canvas_dimensions(cell_size)
   {
@@ -498,6 +522,11 @@ class Game
     CANVAS.style.height = this.canvas_height.toString() + "px";
   }
 
+  /**
+  * @method adjust_font
+  * @param {string} message The message to adjust the font according to.
+  * @param {number} padding The padding to allow on either side of the text in px.
+  */
   adjust_font(message, padding)
   {
     CANVAS_CONTEXT.font = "bold 750pt sans-serif";
@@ -510,35 +539,38 @@ class Game
       text_width = CANVAS_CONTEXT.measureText(message).width;
     }
   }
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ////// Getters and Setters ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /**
   * @method get_canvas_width
-  * @return Return the width of the game's canvas.
+  * @return {natural} Return the width of the game's canvas.
   */
   get_canvas_width()
   {
-    /**@type {natural}*/
     return this.canvas_width;
   }
 
   /**
   * @method get_canvas_height
-  * @return Return the height of the game's canvas.
+  * @return {natural} Return the height of the game's canvas.
   */
   get_canvas_height()
   {
-    /**@type {natural}*/
     return this.canvas_height;
   }
 
+  /**
+  * @method get_cell_size
+  * @return {natural} Return the size of the cells in the canvas.
+  */
   get_cell_size()
   {
     return this.cell_size;
   }
 
+  /**
+  * @method set_cell_size
+  * @param {natural} cell_size The size of the cells in the canvas.
+  */
   set_cell_size(cell_size)
   {
     ////// Ensure Proper Cell Size /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -556,11 +588,19 @@ class Game
     }
   }
 
+  /**
+  * @method get_delay
+  * @return {natural} Return the number of milliseconds that the Game waits before performing the next step.
+  */
   get_delay()
   {
     return this.delay;
   }
 
+  /**
+  * @method set_delay
+  * @param {natural} delay Set the delay in milliseconds the Game will wait between steps.
+  */
   set_delay(delay)
   {
     if(delay > 0)
@@ -573,137 +613,241 @@ class Game
     }
   }
 
+  /**
+  * @method get_font_size
+  * @return {number} Return the size of the current font size on the Canvas.
+  */
   get_font_size()
   {
     return this.font_size;
   }
 
+  /**
+  * @method set_font_size
+  * @param {number} font_size The size of the font to set the canvas to have.
+  */
   set_font_size(font_size)
   {
     this.font_size = font_size;
   }
 
+  /**
+  * @method get_game_state
+  * @return {number} Return the current state of the game.
+  */
   get_game_state()
   {
     return this.game_state;
   }
 
+  /**
+  * @method set_game_state
+  * @param {GAMESTATE_ENUM} game_state_enum The GameState the game should currently be in.
+  */
   set_game_state(game_state_enum)
   {
     this.game_state = game_state_enum;
   }
 
+  /**
+  * @method get_start_game_function_reference
+  * @return {function} Return the reference to the proper function that enables the start of game keyhandler. (activate_start_game_listener)
+  */
   get_start_game_function_reference()
   {
     return this.start_game_function_reference;
   }
 
+  /**
+  * @method set_start_game_function_reference
+  * @param {function} function_reference The reference to the desired funciton that will activate the start of game keyhandler.
+  */
   set_start_game_function_reference(function_reference)
   {
     this.start_game_function_reference = function_reference;
   }
 
+  /**
+  * @method get_player_direction
+  * @return {DIRECTION} Return the players current direction.
+  */
   get_player_direction()
   {
     return this.player_direction;
   }
 
+  /**
+  * @method set_player_direction
+  * @param {DIRECTION} direction_enum The direction to set the Game's direction variable to.
+  */
   set_player_direction(direction_enum)
   {
     this.player_direction = direction_enum;
   }
 
+  /**
+  * @method get_grid
+  * @return {Grid} Return the Game's grid of game pieces.
+  */
   get_grid()
   {
     return this.grid;
   }
 
+  /**
+  * @method set_grid
+  * @param {Grid} grid_object The grid object to store.
+  */
   set_grid(grid_object)
   {
     this.grid = grid_object;
   }
 
+  /**
+  * @method get_snake
+  * @return {Snake} Returns the Game's snake.
+  */
   get_snake()
   {
     return this.snake;
   }
 
+  /**
+  * @method set_snake
+  * @param {Snake} snake_object The snake object to associate with the Game.
+  */
   set_snake(snake_object)
   {
     this.snake = snake_object;
   }
 
+  /**
+  * @method get_apple
+  * @return {Apple} Return the Game's apple object.
+  */
   get_apple()
   {
     return this.apple;
   }
 
+  /**
+  * @method set_apple
+  * @param {Apple} apple_object The apple object to store as the Game's apple.
+  */
   set_apple(apple_object)
   {
     this.apple = apple_object;
   }
 
+  /**
+  * @method get_welcome_message
+  * @return {string} Return the Game's welcome message.
+  */
   get_welcome_message()
   {
     return this.welcome_message;
   }
 
+  /**
+  * @method set_welcome_message
+  * @param {string} message The desired welcome message.
+  */
   set_welcome_message(message)
   {
     this.welcome_message = message;
   }
 
+  /**
+  * @method get_win_message
+  * @return {string} Return the Game's win message.
+  */
   get_win_message()
   {
     return this.win_message;
   }
 
+  /**
+  * @method set_win_message
+  * @param {string} message The desired win message.
+  */
   set_win_message(message)
   {
     this.win_message = message;
   }
 
+  /**
+  * @method get_loss_message
+  * @return {string} Return the Game's loss message.
+  */
   get_loss_message()
   {
     return this.loss_message;
   }
 
+  /**
+  * @method set_win_message
+  * @param {string} message The desired loss message.
+  */
   set_loss_message(message)
   {
     this.loss_message = message;
   }
 
+  /**
+  * @method get_starting_snake_length
+  * @return {natural} Return the number of SnakeNodes the snake should originally start with.
+  */
   get_starting_snake_length()
   {
     return this.starting_snake_length;
   }
 
+  /**
+  * @method set_starting_snake_length
+  * @param {natural} snake_length The starting length of the snake.
+  */
   set_starting_snake_length(snake_length)
   {
     let number_of_cells = (CANVAS.width / this.get_cell_size()) * (CANVAS.height / this.get_cell_size());
-    if(snake_length >= number_of_cells)
+    if(snake_length >= number_of_cells) //Ensure the starting length doesn't exceed the number of cells in the grid minus 1.
     {
       snake_length = number_of_cells - 1;
     }
     this.starting_snake_length = snake_length;
   }
 
+  /**
+  * @method get_background
+  * @return {string} Return the background image path.
+  */
   get_background()
   {
     return this.background;
   }
 
+  /**
+  * @method set_background
+  * @param {string} background The path to the background image.
+  */
   set_background(background)
   {
     document.body.style.backgroundImage = "url(" + background + ")";
     this.background = background;
   }
 
+  /**
+  * @method get_music
+  * @return {string} Return path to a music file.
+  */
   get_music()
   {
     return this.background;
   }
 
+  /**
+  * @method set_music
+  * @param {string} music The path to a music file.
+  */
   set_music(music)
   {
     let embed_tag = document.createElement("embed");
