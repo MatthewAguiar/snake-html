@@ -9,9 +9,9 @@ class Game
   constructor(snake_length, cell_size, speed, colors, background, music)
   {
     ////// Initialize Instance Variables /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    this.cell_size = -1;
     this.canvas_width = -1;
     this.canvas_height = -1;
+    this.cell_size = -1;
     this.delay = -1;
     this.game_state = GAMESTATE_ENUM.start;
     this.start_game_function_reference = undefined;
@@ -22,7 +22,7 @@ class Game
     this.welcome_message = "";
     this.win_message = "";
     this.loss_message = "";
-    this.font_size = -1; //pt.
+    this.font_size = -1; //in pts.
     this.starting_snake_length = -1;
     this.background = "";
     this.music = "";
@@ -50,6 +50,11 @@ class Game
     this.animation();
   }
 
+  /**
+  * @method init_game_pieces
+  * @description Reset the entire game to the starting state!
+  * @param {Array.<string>} colors The array of colors which the snake will be composed of.
+  */
   init_game_pieces(colors)
   {
     ////// Set Initial Direction /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +70,8 @@ class Game
   }
 
   /**
-  * @method animation Does not manage any objects in the game but the sole purpose of this funciton is to draw the start-up message, draw the snake and apple, or win/loss message depending on the
+  * @method animation
+  * @description Does not manage any objects in the game but the sole purpose of this funciton is to draw the start-up message, draw the snake and apple, or win/loss message depending on the
   * current state of the game.
   */
   animation()
@@ -84,6 +90,7 @@ class Game
     ////// Use Game State for Drawing Messages ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     CANVAS_CONTEXT.textAlign = "center";
     CANVAS_CONTEXT.fillStyle = "black";
+    //Display different messages based on the state the game is in.
     switch(this.get_game_state())
     {
       case GAMESTATE_ENUM.start:
@@ -100,7 +107,8 @@ class Game
   }
 
   /**
-  * @method game_loop The main loop of the game that updates different aspects of the game such as moving the snake, placing the apple, and determining a win / loss. It processes
+  * @method game_loop
+  * @description The main loop of the game that updates different aspects of the game such as moving the snake, placing the apple, and determining a win / loss. It processes
   * these things on an interval given by the delay in milliseconds passed into the object.
   */
   game_loop()
@@ -114,7 +122,7 @@ class Game
 
   /**
   * @method step This method will process each aspect of the game when it is called by the interval function above.
-  * @param loop_id The id of the interval function above incase a win / loss state is met in which it needs to be cleared.
+  * @param {integer} loop_id The id of the interval function above incase a win / loss state is met in which it needs to be cleared.
   */
   step(loop_id)
   {
@@ -163,6 +171,12 @@ class Game
     }
   }
 
+  /**
+  * @method end_game
+  * @description This will reactivate the start game press enter listener as well as readjust font and gamestate.
+  * @param {GAMESTATE_ENUM} game_state The gamestate to reset to.
+  * @param {string} message The message to display on the canvas.
+  */
   end_game(game_state, message)
   {
     this.set_game_state(game_state);
@@ -173,7 +187,7 @@ class Game
   /**
   * @method place_apple This will get an array of EMPTY cell coordinates that may be used to place an apple. One of those coordinates are then chosen at random and used to
   * instantiate a new apple object if one does not already exist.
-  * @return Return true if the apple was places properly but false if there is no space to place an apple. Hence the player has won the game.
+  * @return {boolean} Return true if the apple was places properly but false if there is no space to place an apple. Hence the player has won the game.
   */
   place_apple()
   {
@@ -198,11 +212,14 @@ class Game
   }
 
   /**
-  * @method move_snake ...
+  * @method move_snake
+  * @description Shifts the properties such as row, column and direction down the chain of SnakeNodes and also moves the head to the proper coordinates.
+  * @param {DIRECTION} direction The direction the head will be moving in.
+  * @return {boolean} True if the move is valid within the grid and false if not such as going off the grid or crashing into yourself.
   */
   move_snake(direction)
   {
-    direction = this.force_non_reverse(direction);
+    direction = this.force_non_reverse(direction); //Do not allow the 
     let success = this.move_is_valid(direction);
     if(success)
     {
@@ -239,7 +256,10 @@ class Game
   }
 
   /**
-  * @method move_is_valid ...
+  * @method move_is_valid
+  * @description Checks if the move that wants to be made is possible.
+  * @param {DIRECTION} direction The direction in which to check the movement in.
+  * @return {boolean} Return true if the move may be made and false if not.
   */
   move_is_valid(direction)
   {
@@ -494,6 +514,26 @@ class Game
   ////// Getters and Setters ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  /**
+  * @method get_canvas_width
+  * @return Return the width of the game's canvas.
+  */
+  get_canvas_width()
+  {
+    /**@type {natural}*/
+    return this.canvas_width;
+  }
+
+  /**
+  * @method get_canvas_height
+  * @return Return the height of the game's canvas.
+  */
+  get_canvas_height()
+  {
+    /**@type {natural}*/
+    return this.canvas_height;
+  }
+
   get_cell_size()
   {
     return this.cell_size;
@@ -514,26 +554,6 @@ class Game
     {
       this.cell_size = parseInt(cell_size);
     }
-  }
-
-  /**
-  * @method get_canvas_width
-  * @return Return the width of the game's canvas.
-  */
-  get_canvas_width()
-  {
-    /**@type {natural}*/
-    return this.canvas_width;
-  }
-
-  /**
-  * @method get_canvas_height
-  * @return Return the height of the game's canvas.
-  */
-  get_canvas_height()
-  {
-    /**@type {natural}*/
-    return this.canvas_height;
   }
 
   get_delay()
